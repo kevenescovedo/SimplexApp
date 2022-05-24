@@ -1,0 +1,533 @@
+﻿<!DOCTYPE>
+<html>
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Calcúlo Simplex</title>
+        <style>
+        input
+        {
+             font-size:medium;
+        }
+            .style1
+            {
+                width: 105px;
+            }
+        </style>
+    </head>
+    <script type="text/javascript">
+        var coeficienteRestriction = [];
+        var limitsRestriction = [];
+        var table2 = document.createElement("table");
+        var table = document.createElement("table");
+        var VN;
+        var CN;
+        var th = new Array();
+        var bv = new Array();
+        var zx;
+        var zy;
+        var step=0;
+        function initvalue() {
+            xx0.value = -2; xx1.value = -1;
+            x00.value = 0; x01.value = 5;
+            x10.value = 6; x11.value = 2;
+            x20.value = 1; x21.value = 1;
+            b0.value = 15;
+            b1.value = 24;
+            b2.value = 5;
+    
+        }
+        function initM() {
+            xx0.value = 2; xx1.value = 3;
+            x00.value = 0.5; x01.value = .25;
+            x10.value = 1; x11.value = 3;
+            x20.value = 1; x21.value = 1;
+            b0.value = 4;
+            b1.value = 20;
+            b2.value = 10;
+        }
+        function CreateOJ() {
+            // create objective function
+            var s;
+            var ROW;
+            var COL;
+            s = objecttype.options[objecttype.selectedIndex].text + " Z = ";
+            VN = nvar.value;
+            CN = ncon.value;
+            var i;
+            for (i = 0; i < VN; i++) {
+                value = "x" + (i + 1);
+                
+                s += "<input type='number' id='xx" + i + "' size='4'/>" + "<input type='text' value='" + value + "' id='th" + i + "' size='3' />";
+                if (i != VN - 1) {
+                    s += " <span id= 'sinal'>+ </span>";
+                }
+            }
+            of.innerHTML = s;
+    
+            var constring;
+            
+            for (j = 0; j < CN; j++) {
+    
+                temp = "";
+                var div = document.createElement("div");
+                div.classList.add("restrition");
+                for (i = 0; i < VN; i++) {
+                    temp += "<input type='number' class='var_restriction' id='x" + j + i + "' size='3'/><font> </font>" + "<font id='fo_" + i + "' > " + document.getElementById("th" + i).value + " </font>";
+                    if (i != VN - 1) {
+                        temp += "  <span id= 'sinal'>+ </span>";
+                    }
+                }
+                temp += "<select id='equ" + j + "' >";
+                temp += "<option value='less' selected='selected'>&lt;=</option>";
+                temp += "<option value='larger' >&gt;=</option>";
+                temp += "<option value='equal'>=</option>";
+                temp += "</select><font> </font>";
+                temp += "<input type='number' class='limit' id='b" + j + "' size='3' /><br/>";
+                div.innerHTML = temp;
+                constr.appendChild(div);
+            }
+           // constr.innerHTML = temp;
+        }
+      
+    </script>
+    <script type="text/javascript">
+     var a=new Array();
+     var b=new Array();
+     var M = new Array();
+     var row;
+     var col;
+     function begin() {
+     
+         a = new Array(4);
+         for (i = 0; i < a.length; i++) {
+             a[i] = new Array(6);
+         }
+         M = new Array(6);
+         b = new Array(4);
+            row=4;
+            col=6;
+            a[0][0]=-2;a[0][1]=-3;a[0][2]=0;a[0][3]=0;a[0][4]=0;a[0][5]=0;
+            a[1][0]=0.5;a[1][1]=0.25;a[1][2]=0;a[1][3]=0;a[1][4]=0;a[1][5]=0;
+            a[2][0]=1;a[2][1]=3;a[2][2]=0;a[2][3]=-1;a[2][4]=1;a[2][5]=0;
+            a[3][0]=1.0;a[3][1]=1;a[3][2]=0;a[3][3]=0;a[3][4]=0;a[3][5]=1;
+            b[0]=0;b[1]=4;b[2]=20;b[3]=10;
+            M[0] = 2; M[1] = 4; M[2] = 0; M[3] = -1; M[4] = 0; M[5] = 0; M[6] = 30;
+            showtable();
+            checkmax();
+    
+     }
+     function solve() {
+             check();  
+     }
+    
+     function showtable() {
+         display.innerHTML += NewTable();
+     }
+    function check()
+    {
+            
+            var max=-1000.0;
+            var  m=-100;
+            var maxm=-1000.0;
+            var mm=-1;
+            var tz = -1;
+            var i;
+            for(i=0;i<M.length-1;i++){
+                if(M[i]>maxm){
+                    maxm=M[i];
+                    mm=i;
+                }
+                if(M[i]!=0){
+                    tz=0;
+                }
+            }
+    
+    
+    if (maxm <= 0 && maxm != -1000.0 && tz == 0) {
+        alert("Reach Optimal!");
+               display.innerHTML+= "Reach Optimal, We get the optimal solution";
+                return "";
+            }
+            
+            if(tz!=0)
+            {
+            for(i=0;i<M.length-1;i++){
+                    if(a[0][i]>max){
+                        m=i;
+                        max=a[0][i];
+                    }
+                
+            }
+    if (max <= 0) {
+        alert("Reach Optimal!");
+        display.innerHTML+= "Reach Optimal, We get the optimal solution";
+          
+                return "";
+            }
+            }else{
+                m=mm;
+            }
+            
+            var vj=m;
+            var vi=0;
+            var INF=9e9;
+            var test=INF;
+            var minn=INF;
+            var aa;
+            for(i=1;i<row;i++){
+                if(a[i][vj]==0)
+                    test=INF;
+                else
+                test=b[i]/a[i][vj];
+                if(test<minn){
+                    vi=i;
+                    minn=test;
+                }
+            }
+            bv[vi] = vj;
+    if (minn == INF || vi == 0) {
+        message.innerHTML = "no solution";
+                return;
+            }
+            var mpt=a[vi][vj];
+            for(j=0;j<col;j++){
+              var cc;    	 
+                cc=a[vi][j]/mpt;
+                a[vi][j]=cc ;
+                
+            }
+            b[vi]=b[vi]/mpt;
+            var mmp=0;
+            mmp=M[vj];
+            var mmj=0;
+            mmj=a[0][vj];
+            for(j=0;j<col;j++){
+                a[0][j]-=a[vi][j]*mmj;
+                M[j]-=a[vi][j]*mmp;
+            //	System.out.println("M["+j+"] = "+M[j]+"-"+a[vi][j]+"*"+M[vj]+" = "+M[j]);
+                if(j==col-1){
+                     b[0]-=b[vi]*mmj;
+                     M[M.length-1]-=b[vi]*mmp;
+                }
+            }
+            
+            for(i=1;i<row;i++){
+                mpt=a[i][vj];
+                if(i!=vi){
+                for(j=0;j<col;j++){
+                    a[i][j]-=a[vi][j]*mpt;    
+                }
+                b[i]-=b[vi]*mpt;
+                }
+            }
+            showtable();
+            check();
+        }
+        
+        function NewTable() {
+    
+            var s = "<font><b>Step " + step + "</b></font><br/><table border='1' ><tr>";
+            step++;
+            var k;
+            for (i = 0; i < col; i++) {
+                s += "<td width='50'><b>" + th[i] + "</b></td>";
+                k = i;
+            }
+            s += "<td width='50'><b>" + th[k+1] + "</b></td>";
+            s += "<td width='50'><b>r.h.s</b></td>";
+            s += "<td width='50'><b>bv</b></td></tr>";
+            s += "<tr><td>M</td>";
+            for (i = 0; i < col+1; i++) {
+              //  s += "<td><input type='text' size='7' value='" + M[i] + "'/></td>";
+            }
+            s += "</tr>";
+            for (i = 0; i < row; i++) {
+                if (i == 0) {
+                    s += "<td width='30'>1</td>";
+                } else {
+                    s += "<td width='30' >0</td>";
+                }
+                for (j = 0; j < col; j++) {
+                    s += "<td  ><input type='text' size='7' value='" + a[i][j] + "'/></td>"
+                }
+                
+    
+                for (as = 0; as < col; as++) {
+                    var cd=-1;var cc = 0;
+                    if (a[i][as] == 1) {
+                        for (bs = 1; bs < row; bs++) {
+                            if (a[bs][as] == 0) {
+                                cc++;
+                            }
+                        }
+                        if (cc == row - 2) {
+                            //found the base
+                            s += "<td  ><input type='text' size='7' value='" + b[i] + "aaa'/></td>";   
+                            s += "<td ><input type='text' size='7' value='" + th[as+1] + "=" + b[i] + "'/></td>";
+                            break;
+                        }
+                    }
+                }
+                s += "</tr>";
+    
+               
+            }
+            s += "</table>";
+    
+            return s;
+        }
+       function  calculateMax() {
+       
+            table.innerHTML = "";
+        table2.innerHTML = "";
+        
+         constraints = new Array();
+         objective = "";
+        [...document.querySelectorAll(".restrition")].forEach( function (restrition, indexr)  {
+            console.log(restrition);
+            var restritionstring =  "";
+            coeficienteRestriction.push([])
+           console.log("restriçãoo");
+            console.log(indexr);
+            [...restrition.children].forEach(function (element, indexe)  {
+                console.log("var");
+            console.log(indexr);
+               if(element.tagName === 'INPUT')  {
+                    restritionstring += element.value;
+                    if(element.classList.contains('var_restriction')) {
+                        coeficienteRestriction[indexr].push(parseFloat(element.value));
+                    }
+                    if(element.classList.contains('limit')) {
+                        limitsRestriction.push(element.value);
+                    }
+                }
+                else if(element.tagName == 'SELECT') {
+                 restritionstring += element.options[element.selectedIndex].text ;
+                }
+
+               else if(element.tagName = 'SPAN' && element.id == "sinal") {
+                   console.log("mais");
+           restritionstring += " " + element.innerHTML + " ";
+               }
+               else if(element.tagName == "FONT" && element.id.substring(0,2) == "fo") {
+                restritionstring += element.innerHTML.replace(" ", "");
+               }
+                
+            })
+        constraints.push(restritionstring);
+    
+        });
+        console.log(constraints);
+        console.log(coeficienteRestriction);
+       
+            [...document.querySelector("#of").children].forEach(function (element)  {
+               
+               if(element.tagName === 'INPUT')  {
+                    objective += element.value;
+                }
+                else if(element.tagName == 'SELECT') {
+                 objective += element.options[element.selectedIndex].text ;
+
+                }
+               else if(element.tagName = 'SPAN' && element.id == "sinal") {
+                   console.log("mais");
+           objective += " " + element.innerHTML + " ";
+               }
+               else if(element.tagName == "FONT" && element.id.substring(0,2) == "fo") {
+                objective += element.innerHTML.replace(" ", "");
+               }
+                
+            })
+        
+           
+            var input = {
+        type: document.querySelector('#objecttype').value == "MAX" ? "maximize" :"minimize",
+        objective : objective,
+        constraints : constraints
+    };
+    var output = YASMIJ.solve( input );
+  
+    table.innerHTML += ` <tr>
+        <th>Variavéis</th>
+        <th>Valor</th>
+       
+      </tr>`;
+      for (let i = 1; i <= document.getElementById("nvar").value; i++) {
+          console.log("aaaaaaa");
+        table.innerHTML += ` <tr>
+        <td>${'X' + i}</td>
+        <td>${output['result']['x' + i]}</td>
+       
+      `;
+    
+    
+      }
+      
+      table.innerHTML += `<tr>
+        <td>Lucro</td>
+        <td>${output['result']['z']}</td>`;
+       
+      
+      document.body + "<br>";
+    document.body.appendChild(table);
+  
+    table.id = "TableRestrition";
+    var tr = document.createElement("tr");
+   
+    var th = document.createElement("th");
+
+    th.innerHTML = "Linhas"
+    
+
+   th.innerHTML = "Linhas"
+  
+    tr.appendChild(th);
+    
+
+    for (let i = 1; i <= document.getElementById("nvar").value; i++) {
+          console.log("aaaaaaa");
+          let th = document.createElement("th");
+        th.innerHTML = 'X' + i;
+        tr.appendChild(th);
+   
+    
+    
+      }
+      var thLee = document.createElement("th");
+   thLee.innerHTML = "LEE";
+   var thLde = document.createElement("th");
+
+   thLde.innerHTML = "LDE";
+   tr.appendChild(thLee)
+    tr.appendChild(thLde)
+      table2.appendChild(tr);
+      for (let i = 0; i < coeficienteRestriction.length; i++) {
+          console.log("aaaaaaa");
+          var tr2 = document.createElement("tr");
+          let tdLinha = document.createElement("td");
+          let tdLee = document.createElement("td");
+          let tdLde = document.createElement("td");
+
+
+
+          console.log(coeficienteRestriction[i]);
+          console.log("lenght............")
+          console.log(coeficienteRestriction[i].length)
+          
+        tdLinha.innerHTML = i + 1;
+       
+        tr2.appendChild(tdLinha);
+       
+         
+        for (let x = 0 ; x < coeficienteRestriction[i].length; x++) {
+         
+        
+          let tdxs = document.createElement("td");
+
+        tdxs.innerHTML = coeficienteRestriction[i][x];
+        tr2.appendChild(tdxs);
+         
+    
+    
+      }
+      tdLee.innerHTML = coeficienteRestriction[i].reduce(function (acumulador,valor, index) { 
+        let chave = index + 1;
+        console.log(output['result']['x' + chave], "X", valor);
+        acumulador = (output['result']['x' + chave] *valor)  + acumulador;
+        return acumulador;
+        },0);
+       tdLde.innerHTML = limitsRestriction[i];
+      tr2.appendChild(tdLee);
+      tr2.appendChild(tdLde);
+      table2.appendChild(tr2);
+    
+      }
+    
+   
+    document.body.appendChild(table2);
+
+
+
+
+        }
+        function deleteModelagem() {
+            document.getElementById("of").innerHTML = "";
+            document.getElementById("constr").innerHTML = "";
+            table.innerHTML = "";
+            table2.innerHTML = "";
+
+        }
+        function InitTable() {
+            calculateMax();
+             coeficienteRestriction = [];
+             limitsRestriction = [];
+            
+
+            }
+    
+         
+        
+    </script>
+    <body>
+        <br />
+        <table style="width: 107%;">
+            <tr>
+                <td class="style1">
+    
+                <td>
+                    <h1>O algoritmo Simplex</h1>
+                    <p> Resolver Simplex de Maneira Simples</p>
+                </td>
+            </tr>
+            <tr>
+    
+                <td class="style1">
+                </td>
+                <td>
+                   
+    &nbsp;<br />
+                        </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="style1">
+                    &nbsp;</td>
+                <td>
+                    <hr />
+    <font> Tipo de função objetiva:&nbsp;&nbsp;&nbsp; 
+        </font><select id="objecttype" name="D1" >
+    <option value="MAX" >MAX</option>
+    <option value="MIN" selected="selected">MIN</option>
+    </select><br />
+                    <br />
+    <font>Escreva o números de variáveis :&nbsp; &nbsp; </font><input type='number' min="1" step="1" id='nvar' 
+                        style="width: 163px" /><br />
+                    <br />
+    <font>Defina o número de restrições: </font>
+    &nbsp;&nbsp;
+    <input type='number' id='ncon' min="1" step="1" /><br />
+                    <br />
+    &nbsp;<input type="button" value="Criar Modelagem" onclick="CreateOJ()" />&nbsp;&nbsp; <input type="button" value="Apagar Modelagem" onclick="deleteModelagem()" />&nbsp;&nbsp;
+    
+                </td>
+            </tr>
+        </table>
+    <hr /> 
+    <div><b>Função Objetiva:</b></div>
+    <div id="of" align="center" >
+    
+    </div>
+    <div><b>Sujeito A:</b></div>
+    <div id="constr" align="center"> </div>
+    
+    <hr />
+    <input type="button" value="Resolver" onclick="InitTable()"  id="beginbutton"/>
+    
+    <div id="display" />
+    <div id="message" />
+    <script src="./dist/yasmij.js"></script>
+        <script src="main.js"></script>
+    </body>
+</html>
