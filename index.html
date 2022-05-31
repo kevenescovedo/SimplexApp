@@ -59,7 +59,7 @@
             for (i = 0; i < VN; i++) {
                 value = "x" + (i + 1);
                 
-                s += "<input type='number' id='xx" + i + "' size='4'/>" + "<input type='text' value='" + value + "' id='th" + i + "' size='3' />";
+                s += "<input type='number' pattern='[0-9]+' id='xx" + i + "' size='4'/>" + "<input type='text' value='" + value + "' id='th" + i + "' size='3' />";
                 if (i != VN - 1) {
                     s += " <span id= 'sinal'>+ </span>";
                 }
@@ -74,7 +74,7 @@
                 var div = document.createElement("div");
                 div.classList.add("restrition");
                 for (i = 0; i < VN; i++) {
-                    temp += "<input type='number' class='var_restriction' id='x" + j + i + "' size='3'/><font> </font>" + "<font id='fo_" + i + "' > " + document.getElementById("th" + i).value + " </font>";
+                    temp += "<input type='number' pattern='[0-9]+' class='var_restriction' id='x" + j + i + "' size='3'/><font> </font>" + "<font id='fo_" + i + "' > " + document.getElementById("th" + i).value + " </font>";
                     if (i != VN - 1) {
                         temp += "  <span id= 'sinal'>+ </span>";
                     }
@@ -84,7 +84,7 @@
                 temp += "<option value='larger' >&gt;=</option>";
                 temp += "<option value='equal'>=</option>";
                 temp += "</select><font> </font>";
-                temp += "<input type='number' class='limit' id='b" + j + "' size='3' /><br/>";
+                temp += "<input type='number' pattern='[0-9]+' class='limit' id='b" + j + "' size='3' /><br/>";
                 div.innerHTML = temp;
                 constr.appendChild(div);
             }
@@ -295,12 +295,12 @@
                 console.log("var");
             console.log(indexr);
                if(element.tagName === 'INPUT')  {
-                    restritionstring += element.value;
+                    restritionstring += element.value.replace(",", ".");
                     if(element.classList.contains('var_restriction')) {
-                        coeficienteRestriction[indexr].push(parseFloat(element.value));
+                        coeficienteRestriction[indexr].push(parseFloat(element.value.replace(",", ".")));
                     }
                     if(element.classList.contains('limit')) {
-                        limitsRestriction.push(element.value);
+                        limitsRestriction.push(element.value.replace(",", "."));
                     }
                 }
                 else if(element.tagName == 'SELECT') {
@@ -325,7 +325,7 @@
             [...document.querySelector("#of").children].forEach(function (element)  {
                
                if(element.tagName === 'INPUT')  {
-                    objective += element.value;
+                    objective += element.value.replace(",", ".");
                 }
                 else if(element.tagName == 'SELECT') {
                  objective += element.options[element.selectedIndex].text ;
@@ -374,6 +374,9 @@
     document.body.appendChild(table);
   
     table.id = "TableRestrition";
+    table.style.border = "1";
+
+
     var tr = document.createElement("tr");
    
     var th = document.createElement("th");
@@ -442,6 +445,7 @@
       tr2.appendChild(tdLee);
       tr2.appendChild(tdLde);
       table2.appendChild(tr2);
+      table2.style.border = "1";
     
       }
     
@@ -460,10 +464,15 @@
 
         }
         function InitTable() {
-            calculateMax();
+            try {
+                calculateMax();
              coeficienteRestriction = [];
              limitsRestriction = [];
             
+            }catch(ex) {
+                alert("Erro Ao calcular");
+            }
+
 
             }
     
@@ -502,12 +511,12 @@
     <option value="MIN" selected="selected">MIN</option>
     </select><br />
                     <br />
-    <font>Escreva o números de variáveis :&nbsp; &nbsp; </font><input type='number' min="1" step="1" id='nvar' 
+    <font>Escreva o números de variáveis :&nbsp; &nbsp; </font><input type='number'class="integer" min="1" step="1"  id='nvar' 
                         style="width: 163px" /><br />
                     <br />
     <font>Defina o número de restrições: </font>
     &nbsp;&nbsp;
-    <input type='number' id='ncon' min="1" step="1" /><br />
+    <input type='number' class="integer" id='ncon' min="1" step="1" pattern="[0-9]+" /><br />
                     <br />
     &nbsp;<input type="button" value="Criar Modelagem" onclick="CreateOJ()" />&nbsp;&nbsp; <input type="button" value="Apagar Modelagem" onclick="deleteModelagem()" />&nbsp;&nbsp;
     
